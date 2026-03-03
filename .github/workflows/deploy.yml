@@ -1,0 +1,26 @@
+name: Deploy to K3s
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up kubeconfig
+        run: |
+          echo "${{ secrets.KUBECONFIG_DATA }}" > kubeconfig
+          export KUBECONFIG=$PWD/kubeconfig
+          kubectl get nodes
+
+      - name: Deploy to Kubernetes
+        run: |
+          export KUBECONFIG=$PWD/kubeconfig
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
